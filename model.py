@@ -21,13 +21,9 @@ import numpy as np
 
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
-#import pickle
-
 MODEL_DIR = os.environ["MODEL_DIR"]
 MODEL_FILE = os.environ["MODEL_FILE"]
-METADATA_FILE = os.environ["METADATA_FILE"]
 MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILE)
-METADATA_PATH = os.path.join(MODEL_DIR, METADATA_FILE)
 
 print("--- Load data ---")
 print(".......")
@@ -73,23 +69,11 @@ test_doc = word_tokenize("trump")
 test_doc_vector = model.infer_vector(test_doc)
 similar_doc=model.docvecs.most_similar(positive = [test_doc_vector], topn=20)
 
-for i in range(0,len(similar_doc)):
-    sen = list(tagged_data[int(similar_doc[i][0])])
-    finalString = ' '.join(sen[0])
-    result.append(finalString.capitalize())
- 
-    
-metadata = {
-    'top_20_tweets':result
-    }
 
 
 print("Serializing model to: {}".format(MODEL_PATH))
 dump(model, MODEL_PATH)
 
-print("Serializing metadata to: {}".format(METADATA_PATH))
-with open(METADATA_PATH, 'w') as outfile:  
-    json.dump(metadata, outfile)
 
 
 

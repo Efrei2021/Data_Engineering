@@ -16,9 +16,7 @@ from joblib import load
 
 MODEL_DIR = os.environ["MODEL_DIR"]
 MODEL_FILE = os.environ["MODEL_FILE"]
-METADATA_FILE = os.environ["METADATA_FILE"]
 MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILE)
-METADATA_PATH = os.path.join(MODEL_DIR, METADATA_FILE)
 
 app = Flask(__name__)
 model = load(MODEL_PATH)
