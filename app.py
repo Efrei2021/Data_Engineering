@@ -21,13 +21,6 @@ MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILE)
 app = Flask(__name__)
 model = load(MODEL_PATH)
 
-
-def tranform(sen):
-	sen = sen.values
-	finalString = ' '.join(map(str, sen))
-	elt = ast.literal_eval(finalString)
-	finalelt = ' '.join(map(str, elt))
-	return finalelt
      
 @app.route('/')
 def home():   
@@ -35,24 +28,11 @@ def home():
     
 @app.route('/', methods=['POST'])
 def predict():
-	tweet = pd.read_csv("tagged_data.csv")
-	
-	words = []
-	tags = []
-	
-	for elt in tweet['words']:
-	    elt = ast.literal_eval(elt)
-	    words.append(elt)
-	    
-	for elt in tweet['tags']:
-	    elt = ast.literal_eval(elt)
-	    tags.append(elt[0])
-	    
-	    
-	tweet['words'] = words
-	tweet['tags'] = tags
-	
+	tweet = pd.read_csv("tweets.csv")
+	tweets = tweet['text']
+
 	output = []
+	score = []
 	
 	if request.method == 'POST':
 	    enter = request.form['search']
@@ -61,15 +41,16 @@ def predict():
 	    similar_doc=model.docvecs.most_similar(positive = [test_doc_vector], topn=20)
 	    
 	    for i in range(0,len(similar_doc)):
-	        sen = tweet['words'][tweet['tags'] == similar_doc[i][0]]
-	        finalString = tranform(sen)
-	        output.append(finalString.capitalize())
+	    	index = int(similar_doc[i][0])
+	    	score = similar_doc[i][1]
+	    	sen = tweets[index]
+	    	tup = (score, sen)
+    		output.append(tup)
+
     		
     	
 	return render_template('result.html', tweets=output)
     
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', debug=True)
+	app.run(host='0.0.0.0', port="5000", debug=True)
     
-    
-

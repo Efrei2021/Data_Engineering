@@ -16,7 +16,10 @@ import string
 
 import nltk
 nltk.download('punkt')
+nltk.download('stopwords')
 from nltk.tokenize import word_tokenize
+from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
 import numpy as np
 
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
@@ -39,6 +42,7 @@ def text_clean(text):
     #text=re.sub('\w*\d\w*','',text) # remove digit
     text= re.sub('\n','',text)
     return text
+	
 cleaned= lambda x: text_clean(x)
 cleaned_tweets=pd.DataFrame(tweets.apply(cleaned))
 
@@ -49,13 +53,11 @@ print(".......")
 sentences = cleaned_tweets['text']
 tokenized_sent = []
 for s in sentences:
-    tokenized_sent.append(word_tokenize(s.lower()))
+    tokenized_sent.append(word_tokenize(s))
  
 print("--- TaggedDocument ---")
 print(".......")   
 tagged_data = [TaggedDocument(d, [i]) for i, d in enumerate(tokenized_sent)]
-taggeData=pd.DataFrame(tagged_data)
-taggeData.to_csv("tagged_data.csv")
 
 
 ## Train doc2vec model
@@ -63,55 +65,7 @@ print("--- Train doc2vec model ---")
 print(".......")  
 model = Doc2Vec(tagged_data, vector_size = 100, window = 2, min_count = 1, epochs = 100)
 
-#computing meta data
-result = []
-test_doc = word_tokenize("trump")
-test_doc_vector = model.infer_vector(test_doc)
-similar_doc=model.docvecs.most_similar(positive = [test_doc_vector], topn=20)
-
-
 
 print("Serializing model to: {}".format(MODEL_PATH))
 dump(model, MODEL_PATH)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-# Saving model to disk
-print("--- Saving model to disk ---")
-print(".......") 
-pickle.dump(model, open('model.pkl','wb'))
-"""
-
-
-
-
-"""
-# Loading model to test
-print("--- Loading model to test ---")
-print(".......") 
-model = pickle.load(open('model.pkl','rb'))
-test_doc = word_tokenize("trump")
-test_doc_vector = model.infer_vector(test_doc)
-similar_doc=model.docvecs.most_similar(positive = [test_doc_vector], topn=20)
-
-for i in range(0,len(similar_doc)):
-    sen = list(tagged_data[int(similar_doc[i][0])])
-    finalString = ' '.join(sen[0])
-    print(finalString.capitalize())
-    print('\n')
-"""
-
-
 

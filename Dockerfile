@@ -10,8 +10,6 @@ ENV MODEL_DIR=/app/mlsample/model
 
 ENV MODEL_FILE=/model.joblib
 
-ENV METADATA_FILE=metadata.json
-
 ENV FLASK_APP=app.py
 
 COPY requirements.txt .
